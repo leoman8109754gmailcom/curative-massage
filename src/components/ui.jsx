@@ -1,7 +1,7 @@
 // Shared building blocks used across sections.
 import { Link } from 'react-router-dom'
-import logoLight from '../assets/logo-light.png'
-import logoDark from '../assets/logo-dark.png'
+import logoLight from '../assets/logo-light.svg'
+import logoDark from '../assets/logo-dark.svg'
 
 // Internal routes ("/services", "/#book") go through the router; anything else is a plain anchor.
 export function SmartLink({ href = '#', children, ...props }) {
@@ -52,7 +52,7 @@ export function Logo({ tone = 'light', className = '', imgClassName = 'h-8' }) {
         src={tone === 'dark' ? logoDark : logoLight}
         alt="Curative Massage — Massage & Bodywork"
         width="744"
-        height="124"
+        height="128"
         className={`w-auto max-w-none ${imgClassName}`}
       />
     </Link>
