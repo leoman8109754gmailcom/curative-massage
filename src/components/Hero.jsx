@@ -1,11 +1,17 @@
 import { Button, ImageSlot } from './ui'
+import heroImage from '../assets/hero.webp'
 
 export default function Hero() {
   return (
     <section className="relative min-h-[560px] overflow-hidden lg:min-h-[640px]">
-      {/* Background image — replace src when the hero photo is ready */}
-      <ImageSlot src={null} alt="Candle, oil bottle and towel" label="Hero image" className="absolute inset-0 h-full w-full" />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-black/30" />
+      {/* scale-[1.02] trims the thin dark edge baked into the photo */}
+      <ImageSlot
+        src={heroImage}
+        alt="Lit candles, an essential oil bottle and a folded towel"
+        className="absolute inset-0 h-full w-full scale-[1.02] object-[60%_center]"
+      />
+      {/* Photo is already dark: keep the overlay light, just enough for the text */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/5 to-black/20" />
 
       <div className="relative mx-auto flex min-h-[560px] max-w-7xl flex-col justify-between px-6 py-14 lg:min-h-[640px] lg:px-12">
         <p className="ml-auto max-w-sm text-right text-[11px] uppercase leading-relaxed tracking-[0.12em] text-cream-light/90 md:text-left">

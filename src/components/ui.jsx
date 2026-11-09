@@ -1,7 +1,7 @@
 // Shared building blocks used across sections.
 import { Link } from 'react-router-dom'
 
-// Internal routes ("/services", "/#about") go through the router; anything else is a plain anchor.
+// Internal routes ("/services", "/#book") go through the router; anything else is a plain anchor.
 export function SmartLink({ href = '#', children, ...props }) {
   if (href.startsWith('/')) return <Link to={href} {...props}>{children}</Link>
   return <a href={href} {...props}>{children}</a>

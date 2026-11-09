@@ -1,4 +1,5 @@
 import { Button, ImageSlot } from './ui'
+import studioImage from '../assets/studio.webp'
 
 export default function BookingCta() {
   return (
@@ -13,7 +14,11 @@ export default function BookingCta() {
         <Button href="/#book" variant="cream" className="mt-6 bg-white px-3 py-1">Book</Button>
       </div>
 
-      <ImageSlot src={null} alt="Massage table in a calm treatment room" label="Studio image" className="h-[320px] w-full md:h-[480px]" />
+      <ImageSlot
+        src={studioImage}
+        alt="Massage table in a warmly lit treatment room with salt lamps and plants"
+        className="block h-[360px] w-full object-[45%_center] md:h-auto md:aspect-[16/9]"
+      />
     </section>
   )
 }

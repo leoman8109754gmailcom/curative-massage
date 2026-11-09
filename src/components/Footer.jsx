@@ -1,13 +1,9 @@
 import { Logo, SmartLink } from './ui'
 
-const primary = [
+const links = [
   { label: 'Our services', href: '/services' },
   { label: 'Book now', href: '/#book' },
   { label: 'Contact us', href: '/contact' },
-]
-const secondary = [
-  { label: 'Pricing', href: '/#pricing' },
-  { label: 'Company', href: '/#about' },
 ]
 const legal = ['Terms of service', 'Cookies settings']
 
@@ -17,14 +13,9 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-8 lg:px-12">
         <Logo className="justify-center" />
 
-        <nav className="mt-10 flex flex-col items-center gap-4 text-sm">
+        <nav className="mt-10 text-sm">
           <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-            {primary.map((l) => (
-              <li key={l.label}><SmartLink href={l.href} className="hover:text-white">{l.label}</SmartLink></li>
-            ))}
-          </ul>
-          <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-            {secondary.map((l) => (
+            {links.map((l) => (
               <li key={l.label}><SmartLink href={l.href} className="hover:text-white">{l.label}</SmartLink></li>
             ))}
           </ul>

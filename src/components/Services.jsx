@@ -53,7 +53,7 @@ export default function Services() {
           ))}
         </div>
 
-        <Button href="/services" variant="clay" className="mt-16 rounded-full">
+        <Button href="/services" variant="blue" className="mt-16 rounded-full">
           Explore more <Chevron />
         </Button>
       </div>
