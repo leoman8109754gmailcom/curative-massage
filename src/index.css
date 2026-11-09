@@ -1,0 +1,46 @@
+@import "tailwindcss";
+
+/* Brand tokens — use as bg-slate-blue, text-cream, etc. */
+@theme {
+  --color-slate-blue: #455763;
+  --color-slate-blue-dark: #3a4a54;
+  --color-cream: #d3dbdd;
+  --color-cream-light: #f3ede6;
+  --color-clay: #8a6a64;
+
+  --font-display: "Cinzel", "Times New Roman", serif;
+  --font-body: "Marcellus", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-cream font-body text-slate-blue antialiased;
+  }
+}
+
+/* Placeholder for images until real assets arrive */
+@utility img-placeholder {
+  background: repeating-linear-gradient(
+      45deg,
+      rgb(255 255 255 / 0.04) 0 12px,
+      transparent 12px 24px
+    ),
+    linear-gradient(135deg, #5a6c77, #2f3c44);
+}
+
+/* Treatment detail pane fade/slide-in (replays each time the active treatment changes) */
+@theme {
+  --animate-treatment-in: treatment-in 0.45s ease-out both;
+  @keyframes treatment-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
