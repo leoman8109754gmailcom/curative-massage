@@ -27,8 +27,8 @@ function Details({ treatment, compact = false }) {
         Price: {treatment.price}
       </p>
       <div className="mt-5 flex items-center gap-2">
-        <Button href="/#book" variant="blue" className="bg-white/10 hover:bg-white/15">Book</Button>
-        <Button href="/#book" variant="ghost">
+        <Button href={`/book?treatment=${treatment.id}`} variant="blue" className="bg-white/10 hover:bg-white/15">Book</Button>
+        <Button href={`/book?treatment=${treatment.id}`} variant="ghost">
           Book <Chevron />
         </Button>
       </div>

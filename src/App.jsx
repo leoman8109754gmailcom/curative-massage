@@ -5,6 +5,7 @@ import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
 import ServicesPage from './pages/ServicesPage'
 import ContactPage from './pages/ContactPage'
+import BookingPage from './pages/BookingPage'
 
 // On page change: jump to the #section if the link has one, otherwise go to the top.
 function ScrollManager() {
@@ -29,6 +30,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/book" element={<BookingPage />} />
         </Routes>
       </main>
       <Footer />

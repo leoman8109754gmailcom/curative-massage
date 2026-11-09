@@ -31,7 +31,7 @@ export default function Hero() {
             Moments
           </h1>
           <div className="mt-8 flex gap-3">
-            <Button href="/#book" variant="cream">Book</Button>
+            <Button href="/book" variant="cream">Book</Button>
             <Button href="/services" variant="blue">Learn</Button>
           </div>
         </div>

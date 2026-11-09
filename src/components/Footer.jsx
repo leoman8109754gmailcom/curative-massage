@@ -2,7 +2,7 @@ import { Logo, SmartLink } from './ui'
 
 const links = [
   { label: 'Our services', href: '/services' },
-  { label: 'Book now', href: '/#book' },
+  { label: 'Book now', href: '/book' },
   { label: 'Contact us', href: '/contact' },
 ]
 const legal = ['Terms of service', 'Cookies settings']

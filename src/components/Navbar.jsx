@@ -64,7 +64,7 @@ export default function Navbar() {
 
         {/* Right: book */}
         <div className="justify-self-end">
-          <Button href="/#book" variant="cream" className="rounded-full px-3 py-1">Book</Button>
+          <Button href="/book" variant="cream" className="rounded-full px-3 py-1">Book</Button>
         </div>
       </nav>
 

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { submitContact, topics, referralSources } from '../lib/contact'
+import { Field, labelClass, inputClass } from '../components/form'
 
 // Placeholder contact details from the design. Replace with the real ones.
 const contactInfo = {
@@ -16,20 +17,6 @@ const emptyForm = {
   topic: '',
   referral: '',
   message: '',
-}
-
-const labelClass = 'block text-sm uppercase tracking-[0.06em] text-slate-blue/85'
-const inputClass =
-  'mt-2 w-full border-0 border-b border-slate-blue/70 bg-transparent px-0 py-3 text-sm tracking-wide text-slate-blue outline-none transition-colors placeholder:uppercase placeholder:text-slate-blue/60 focus:border-slate-blue focus:ring-0 aria-[invalid=true]:border-red-700'
-
-function Field({ label, name, error, children }) {
-  return (
-    <div>
-      <label htmlFor={name} className={labelClass}>{label}</label>
-      {children}
-      {error && <p id={`${name}-error`} className="mt-1 text-xs text-red-700">{error}</p>}
-    </div>
-  )
 }
 
 function validate(values) {

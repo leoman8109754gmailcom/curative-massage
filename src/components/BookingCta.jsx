@@ -11,7 +11,7 @@ export default function BookingCta() {
         <p className="mt-4 text-[11px] uppercase tracking-[0.12em] text-cream/80">
           Stop carrying what you were never meant to hold. Book your time with us.
         </p>
-        <Button href="/#book" variant="cream" className="mt-6 bg-white px-3 py-1">Book</Button>
+        <Button href="/book" variant="cream" className="mt-6 bg-white px-3 py-1">Book</Button>
       </div>
 
       <ImageSlot

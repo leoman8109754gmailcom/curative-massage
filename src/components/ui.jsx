@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import logoLight from '../assets/logo-light.svg'
 import logoDark from '../assets/logo-dark.svg'
 
-// Internal routes ("/services", "/#book") go through the router; anything else is a plain anchor.
+// Internal routes ("/services", "/book") go through the router; anything else is a plain anchor.
 export function SmartLink({ href = '#', children, ...props }) {
   if (href.startsWith('/')) return <Link to={href} {...props}>{children}</Link>
   return <a href={href} {...props}>{children}</a>
