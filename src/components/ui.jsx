@@ -1,5 +1,7 @@
 // Shared building blocks used across sections.
 import { Link } from 'react-router-dom'
+import logoLight from '../assets/logo-light.png'
+import logoDark from '../assets/logo-dark.png'
 
 // Internal routes ("/services", "/#book") go through the router; anything else is a plain anchor.
 export function SmartLink({ href = '#', children, ...props }) {
@@ -42,16 +44,17 @@ export function ImageSlot({ src, alt = '', label, className = '' }) {
   )
 }
 
-export function Logo({ className = '' }) {
-  // Placeholder mark — replace with the real logo file later.
+// `tone="light"` (cream) is for dark-blue backgrounds; `tone="dark"` (blue) is for light backgrounds.
+export function Logo({ tone = 'light', className = '', imgClassName = 'h-8' }) {
   return (
-    <Link to="/" className={`flex items-center gap-2 text-cream ${className}`}>
-      <span className="text-lg leading-none">❧</span>
-      <span className="font-display text-[9px] leading-tight tracking-[0.2em] uppercase">
-        Curative Massage
-        <br />& Bodyworks
-      </span>
-      <span className="-scale-x-100 text-lg leading-none">❧</span>
+    <Link to="/" aria-label="Curative Massage & Bodywork — home" className={`flex items-center ${className}`}>
+      <img
+        src={tone === 'dark' ? logoDark : logoLight}
+        alt="Curative Massage — Massage & Bodywork"
+        width="186"
+        height="31"
+        className={`w-auto ${imgClassName}`}
+      />
     </Link>
   )
 }

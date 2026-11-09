@@ -11,7 +11,7 @@ export default function Footer() {
   return (
     <footer className="bg-slate-blue font-sans text-cream">
       <div className="mx-auto max-w-7xl px-6 pt-16 pb-8 lg:px-12">
-        <Logo className="justify-center" />
+        <Logo className="justify-center" imgClassName="h-11 md:h-12" />
 
         <nav className="mt-10 text-sm">
           <ul className="flex flex-wrap justify-center gap-x-6 gap-y-2">
