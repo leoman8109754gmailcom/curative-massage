@@ -51,9 +51,9 @@ export function Logo({ tone = 'light', className = '', imgClassName = 'h-8' }) {
       <img
         src={tone === 'dark' ? logoDark : logoLight}
         alt="Curative Massage — Massage & Bodywork"
-        width="186"
-        height="31"
-        className={`w-auto ${imgClassName}`}
+        width="744"
+        height="124"
+        className={`w-auto max-w-none ${imgClassName}`}
       />
     </Link>
   )
