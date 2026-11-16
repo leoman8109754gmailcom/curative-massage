@@ -10,6 +10,7 @@ export const emptyIntake = {
   pressure: '', focusAreas: '', avoidAreas: '',
   hasAllergies: '', allergyItems: [], allergyOther: '', allergyDetails: '',
   consent: false, signature: '',
+  changes: '', // returning clients: anything new since their last visit
 }
 
 const phoneOk = (v) => /^[\d\s()+.-]{7,}$/.test(v)
@@ -36,6 +37,53 @@ export function validateIntake(v) {
   else if (v.fullName.trim() && v.signature.trim().toLowerCase() !== v.fullName.trim().toLowerCase())
     e.signature = 'Your signature should match the full name above.'
   return e
+}
+
+// Short form for returning clients whose intake form is still current.
+export function validateReturning(v) {
+  const e = {}
+  if (!v.fullName.trim()) e.fullName = 'Please enter your full name.'
+  if (!v.phone.trim()) e.phone = 'Please enter your phone number.'
+  else if (!phoneOk(v.phone)) e.phone = 'Please enter a valid phone number.'
+  if (!v.email.trim()) e.email = 'Please enter your email.'
+  else if (!/^\S+@\S+\.\S+$/.test(v.email)) e.email = 'Please enter a valid email.'
+  return e
+}
+
+export function ReturningForm({ values, setValues, errors, setErrors }) {
+  const onInput = (e) => {
+    const { name, value } = e.target
+    setValues((v) => ({ ...v, [name]: value }))
+    if (errors[name]) setErrors((er) => ({ ...er, [name]: undefined }))
+  }
+  const fp = (name) => ({
+    id: name, name, value: values[name], onChange: onInput,
+    'aria-invalid': errors[name] ? true : undefined,
+    'aria-describedby': errors[name] ? `${name}-error` : undefined,
+  })
+  return (
+    <div className="space-y-12">
+      <Section number={1} title="Your details">
+        <div className="grid gap-8 sm:grid-cols-2 sm:gap-6">
+          <Field label="Full name" name="fullName" error={errors.fullName}>
+            <input type="text" autoComplete="name" className={inputClass} {...fp('fullName')} />
+          </Field>
+          <Field label="Phone number" name="phone" error={errors.phone}>
+            <input type="tel" autoComplete="tel" className={inputClass} {...fp('phone')} />
+          </Field>
+          <Field label="Email address" name="email" error={errors.email}>
+            <input type="email" autoComplete="email" className={inputClass} {...fp('email')} />
+          </Field>
+        </div>
+      </Section>
+      <Section number={2} title="Anything new?">
+        <Field label="Changes since your last visit" name="changes"
+          hint="Any new health conditions, injuries, medications, allergies, or areas you'd like addressed. Leave blank if nothing has changed.">
+          <textarea rows={4} placeholder="Type here…" className={textareaClass} {...fp('changes')} />
+        </Field>
+      </Section>
+    </div>
+  )
 }
 
 function Section({ number, title, children }) {

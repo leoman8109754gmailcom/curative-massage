@@ -1,5 +1,9 @@
 // Options for the client intake form (from the client's PDF intake form).
 
+// Returning clients only fill out the full intake form again if their last one
+// is older than this many months.
+export const intakeValidMonths = 6
+
 export const healthConditions = [
   'High blood pressure',
   'Low blood pressure',

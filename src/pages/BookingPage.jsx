@@ -4,15 +4,15 @@ import { treatments } from '../data/treatments'
 import { sessionLengths, businessTimeZone } from '../data/availability'
 import { getBookedSlots, submitBooking, studioNow, formatDate, formatTime, formatDuration } from '../lib/booking'
 import DateTimePicker from '../components/booking/DateTimePicker'
-import IntakeForm, { emptyIntake, validateIntake } from '../components/booking/IntakeForm'
+import IntakeForm, { emptyIntake, validateIntake, ReturningForm, validateReturning } from '../components/booking/IntakeForm'
+import { intakeValidMonths } from '../data/intake'
+import { Radio, Reveal, labelClass } from '../components/form'
 import { Button } from '../components/ui'
 
-const STEPS = ['Session', 'Date & time', 'Intake form', 'Review']
-
-function Stepper({ step, onJump }) {
+function Stepper({ step, onJump, steps }) {
   return (
     <ol className="mx-auto flex max-w-3xl items-center">
-      {STEPS.map((label, i) => {
+      {steps.map((label, i) => {
         const done = i < step, current = i === step
         return (
           <li key={label} className="flex flex-1 items-center last:flex-none">
@@ -36,7 +36,7 @@ function Stepper({ step, onJump }) {
               </span>
               <span className={`hidden text-[10px] uppercase tracking-[0.15em] sm:block ${current ? 'text-slate-blue' : 'text-slate-blue/55'}`}>{label}</span>
             </button>
-            {i < STEPS.length - 1 && (
+            {i < steps.length - 1 && (
               <span className="mx-2 h-px flex-1 bg-slate-blue/20 sm:mx-3 sm:-mt-6">
                 <span className={`block h-px bg-slate-blue transition-all duration-500 ${done ? 'w-full' : 'w-0'}`} />
               </span>
@@ -88,6 +88,8 @@ export default function BookingPage() {
   const [treatmentId, setTreatmentId] = useState(preset?.id ?? null)
   const [duration, setDuration] = useState(sessionLengths[0])
   const [slot, setSlot] = useState({ date: null, time: null })
+  const [clientType, setClientType] = useState('') // 'new' | 'returning'
+  const [recentIntake, setRecentIntake] = useState('') // returning only: 'yes' | 'no' | 'unsure'
   const [booked, setBooked] = useState([])
   const [intake, setIntake] = useState(emptyIntake)
   const [errors, setErrors] = useState({})
@@ -97,6 +99,13 @@ export default function BookingPage() {
   const today = studioNow().date
   const treatment = treatments.find((t) => t.id === treatmentId)
 
+  // New clients, and returning clients whose last intake form is older than
+  // `intakeValidMonths` (or who aren't sure), fill out the full form.
+  // Later, with Sanity: look up the client's last intake date by email instead of asking.
+  const fullIntake = clientType !== 'returning' || recentIntake !== 'yes'
+  const steps = ['Session', 'Date & time', fullIntake ? 'Intake form' : 'Your details', 'Review']
+  const clientReady = clientType === 'new' || (clientType === 'returning' && recentIntake)
+
   useEffect(() => { getBookedSlots().then(setBooked) }, [])
 
   const go = (n) => {
@@ -105,7 +114,7 @@ export default function BookingPage() {
   }
 
   const nextFromIntake = () => {
-    const found = validateIntake(intake)
+    const found = fullIntake ? validateIntake(intake) : validateReturning(intake)
     setErrors(found)
     const first = Object.keys(found)[0]
     if (first) {
@@ -130,25 +139,38 @@ export default function BookingPage() {
         startMinutes: slot.time,
         timeZone: businessTimeZone,
       },
-      client: {
-        fullName: v.fullName, dateOfBirth: v.dob, phone: v.phone, email: v.email,
-        address: { street: v.street, city: v.city, state: v.state, zip: v.zip },
-        emergencyContact: { name: v.emergencyName, phone: v.emergencyPhone },
-      },
-      health: {
-        conditions: v.conditions.filter((c) => c !== 'Other'),
-        otherCondition: v.conditions.includes('Other') ? v.conditionsOther : '',
-        concerns: v.concerns,
-        medications: v.medications,
-      },
-      preferences: { pressure: v.pressure, focusAreas: v.focusAreas, avoidAreas: v.avoidAreas },
-      allergies: {
-        hasAllergies: v.hasAllergies === 'yes',
-        items: v.hasAllergies === 'yes' ? v.allergyItems.filter((a) => a !== 'Other') : [],
-        other: v.hasAllergies === 'yes' && v.allergyItems.includes('Other') ? v.allergyOther : '',
-        details: v.hasAllergies === 'yes' ? v.allergyDetails : '',
-      },
-      consent: { agreed: v.consent, signature: v.signature, signedDate: today },
+      client: fullIntake
+        ? {
+            type: clientType, // 'new' | 'returning'
+            fullName: v.fullName, dateOfBirth: v.dob, phone: v.phone, email: v.email,
+            address: { street: v.street, city: v.city, state: v.state, zip: v.zip },
+            emergencyContact: { name: v.emergencyName, phone: v.emergencyPhone },
+          }
+        : { type: clientType, fullName: v.fullName, phone: v.phone, email: v.email },
+      intake: fullIntake
+        ? {
+            // 'new' = first visit, 'renewed' = returning client whose form was out of date
+            status: clientType === 'new' ? 'new' : 'renewed',
+            health: {
+              conditions: v.conditions.filter((c) => c !== 'Other'),
+              otherCondition: v.conditions.includes('Other') ? v.conditionsOther : '',
+              concerns: v.concerns,
+              medications: v.medications,
+            },
+            preferences: { pressure: v.pressure, focusAreas: v.focusAreas, avoidAreas: v.avoidAreas },
+            allergies: {
+              hasAllergies: v.hasAllergies === 'yes',
+              items: v.hasAllergies === 'yes' ? v.allergyItems.filter((a) => a !== 'Other') : [],
+              other: v.hasAllergies === 'yes' && v.allergyItems.includes('Other') ? v.allergyOther : '',
+              details: v.hasAllergies === 'yes' ? v.allergyDetails : '',
+            },
+            consent: { agreed: v.consent, signature: v.signature, signedDate: today },
+          }
+        : {
+            // Returning client who says their last form is within `intakeValidMonths`
+            status: 'on-file',
+            changesSinceLastVisit: v.changes,
+          },
       submittedAt: new Date().toISOString(),
     }
     try {
@@ -190,7 +212,7 @@ export default function BookingPage() {
             </div>
           ) : (
             <>
-              <Stepper step={step} onJump={go} />
+              <Stepper step={step} onJump={go} steps={steps} />
 
               <div key={step} className="animate-treatment-in mt-14">
                 {/* STEP 1: session */}
@@ -237,7 +259,56 @@ export default function BookingPage() {
                       ))}
                     </div>
 
-                    <NavButtons onNext={() => go(1)} nextDisabled={!treatment} />
+                    <h3 className="mt-12 font-display text-xl uppercase tracking-wide">Have you visited before?</h3>
+                    <div className="mt-5 grid gap-4 sm:max-w-2xl sm:grid-cols-2">
+                      {[
+                        ['new', 'New client', 'First time booking with me'],
+                        ['returning', 'Returning client', "I've had a session here before"],
+                      ].map(([value, title, sub]) => {
+                        const active = clientType === value
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            onClick={() => setClientType(value)}
+                            aria-pressed={active}
+                            className={`rounded-2xl border p-5 text-left transition-all duration-300 ${
+                              active ? 'border-slate-blue bg-slate-blue text-cream shadow-lg' : 'border-slate-blue/25 hover:border-slate-blue/60 hover:bg-white/20'
+                            }`}
+                          >
+                            <span className={`block font-display text-lg uppercase tracking-wide ${active ? 'text-white' : ''}`}>{title}</span>
+                            <span className={`mt-1 block text-[11px] uppercase tracking-[0.06em] ${active ? 'text-cream/80' : 'text-slate-blue/70'}`}>{sub}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    <Reveal open={clientType === 'returning'}>
+                      <div className="pt-8">
+                        <fieldset>
+                          <legend className={labelClass}>
+                            Have you filled out the intake form in the last {intakeValidMonths} months?
+                          </legend>
+                          <div className="mt-4 flex flex-wrap gap-x-10 gap-y-4">
+                            <Radio name="recentIntake" value="yes" checked={recentIntake === 'yes'} onChange={() => setRecentIntake('yes')}>Yes</Radio>
+                            <Radio name="recentIntake" value="no" checked={recentIntake === 'no'} onChange={() => setRecentIntake('no')}>No</Radio>
+                            <Radio name="recentIntake" value="unsure" checked={recentIntake === 'unsure'} onChange={() => setRecentIntake('unsure')}>Not sure</Radio>
+                          </div>
+                        </fieldset>
+                      </div>
+                    </Reveal>
+
+                    {clientReady && (
+                      <p key={`${clientType}-${recentIntake}`} className="animate-treatment-in mt-8 max-w-2xl rounded-xl border border-slate-blue/20 bg-white/25 px-5 py-4 text-xs uppercase leading-relaxed tracking-[0.06em] text-slate-blue/85">
+                        {fullIntake
+                          ? clientType === 'new'
+                            ? 'As a new client, you’ll fill out a short intake form about your health and preferences after picking a time.'
+                            : `Since your last form may be more than ${intakeValidMonths} months old, you’ll fill out a fresh intake form after picking a time.`
+                          : 'Your intake form is still on file, so you’ll only need to confirm your contact details and note anything that has changed.'}
+                      </p>
+                    )}
+
+                    <NavButtons onNext={() => go(1)} nextDisabled={!treatment || !clientReady} />
                   </div>
                 )}
 
@@ -258,12 +329,18 @@ export default function BookingPage() {
                 {/* STEP 3: intake form */}
                 {step === 2 && (
                   <div>
-                    <h2 className="font-display text-2xl uppercase tracking-wide md:text-3xl">Client intake form</h2>
+                    <h2 className="font-display text-2xl uppercase tracking-wide md:text-3xl">
+                      {fullIntake ? 'Client intake form' : 'Welcome back'}
+                    </h2>
                     <p className="mt-3 text-xs uppercase leading-relaxed tracking-[0.08em] text-slate-blue/75">
-                      This helps me plan a safe, effective session. Fields marked by an error are required.
+                      {fullIntake
+                        ? 'This helps me plan a safe, effective session. Fields marked by an error are required.'
+                        : 'Your intake form is on file. Just confirm your details and let me know if anything has changed.'}
                     </p>
                     <div className="mt-10">
-                      <IntakeForm values={intake} setValues={setIntake} errors={errors} setErrors={setErrors} signedDate={usDate(today)} />
+                      {fullIntake
+                        ? <IntakeForm values={intake} setValues={setIntake} errors={errors} setErrors={setErrors} signedDate={usDate(today)} />
+                        : <ReturningForm values={intake} setValues={setIntake} errors={errors} setErrors={setErrors} />}
                     </div>
                     <NavButtons onBack={() => go(1)} onNext={nextFromIntake} nextLabel="Review booking" />
                   </div>
@@ -295,9 +372,17 @@ export default function BookingPage() {
                       </button>
                     </div>
                     <dl className="mt-4">
+                      <SummaryRow label="Client">
+                        {clientType === 'new' ? 'New client'
+                          : fullIntake ? 'Returning client · updated intake form' : 'Returning client · intake form on file'}
+                      </SummaryRow>
                       <SummaryRow label="Name">{intake.fullName}</SummaryRow>
-                      <SummaryRow label="Date of birth">{intake.dob && usDate(intake.dob)}</SummaryRow>
                       <SummaryRow label="Phone / Email">{intake.phone} · {intake.email}</SummaryRow>
+                      {!fullIntake && (
+                        <SummaryRow label="Changes since last visit">{intake.changes.trim() || 'Nothing new'}</SummaryRow>
+                      )}
+                      {fullIntake && <>
+                      <SummaryRow label="Date of birth">{intake.dob && usDate(intake.dob)}</SummaryRow>
                       <SummaryRow label="Address">
                         {(intake.street || intake.city || intake.zip) && [intake.street, intake.city, intake.state, intake.zip].filter(Boolean).join(', ')}
                       </SummaryRow>
@@ -315,6 +400,7 @@ export default function BookingPage() {
                           : [...intake.allergyItems.filter((a) => a !== 'Other'), intake.allergyOther].filter(Boolean).join(', ')}
                       </SummaryRow>
                       <SummaryRow label="Signed">{intake.signature} · {usDate(today)}</SummaryRow>
+                      </>}
                     </dl>
 
                     {status === 'error' && (
