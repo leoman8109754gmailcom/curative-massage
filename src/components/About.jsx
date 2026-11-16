@@ -1,4 +1,4 @@
-import { Button, Chevron, ImageSlot } from './ui'
+import { Button, ImageSlot } from './ui'
 
 export default function About() {
   return (
@@ -11,11 +11,8 @@ export default function About() {
             Curative Massage and Bodyworks exists because I believe healing is not
             luxury but necessity.
           </p>
-          <div className="mt-6 flex items-center gap-2">
+          <div className="mt-6">
             <Button href="/contact" variant="blue" className="bg-white/10 hover:bg-white/15">Contact</Button>
-            <Button href="/contact" variant="ghost">
-              Connect <Chevron />
-            </Button>
           </div>
         </div>
 
