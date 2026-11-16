@@ -1,6 +1,12 @@
 import TreatmentsPanel from '../components/TreatmentsPanel'
+import { useTreatments, countWord } from '../lib/treatments'
 
 export default function ServicesPage() {
+  const { treatments, loading } = useTreatments()
+  const n = treatments.length
+  // Updates itself when techniques are added or removed: "Five paths…", "Six paths…"
+  const heading = loading ? 'Paths to healing and renewal' : `${countWord(n)} ${n === 1 ? 'path' : 'paths'} to healing and renewal`
+
   return (
     <>
       {/* Page header */}
@@ -17,7 +23,7 @@ export default function ServicesPage() {
           <div className="text-center">
             <p className="text-xs uppercase tracking-[0.15em] text-slate-blue/75">Treatments</p>
             <h2 className="mx-auto mt-4 max-w-3xl font-display text-3xl uppercase leading-tight tracking-wide md:text-5xl">
-              Five paths to healing and renewal
+              {heading}
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-sm uppercase leading-relaxed tracking-[0.08em] text-slate-blue/85">
               Each service is crafted with intention and skill. I listen to what your body needs and
@@ -26,7 +32,7 @@ export default function ServicesPage() {
           </div>
 
           <div className="mt-16">
-            <TreatmentsPanel />
+            <TreatmentsPanel treatments={treatments} loading={loading} />
           </div>
         </div>
       </section>

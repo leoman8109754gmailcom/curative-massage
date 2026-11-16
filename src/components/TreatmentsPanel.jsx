@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { treatments } from '../data/treatments'
 import { Button, Chevron } from './ui'
 
 function HandIcon({ className = 'h-11 w-11' }) {
@@ -26,9 +25,8 @@ function Details({ treatment, compact = false }) {
       <p className={`${compact ? 'mt-4 text-lg' : 'mt-8 text-2xl'} font-display uppercase tracking-wide text-white`}>
         Price: {treatment.price}
       </p>
-      <div className="mt-5 flex items-center gap-2">
-        <Button href={`/book?treatment=${treatment.id}`} variant="blue" className="bg-white/10 hover:bg-white/15">Book</Button>
-        <Button href={`/book?treatment=${treatment.id}`} variant="ghost">
+      <div className="mt-5">
+        <Button href={`/book?treatment=${treatment.id}`} variant="ghost" className="-ml-4">
           Book <Chevron />
         </Button>
       </div>
@@ -36,13 +34,34 @@ function Details({ treatment, compact = false }) {
   )
 }
 
-export default function TreatmentsPanel() {
-  // Desktop: hovering a title makes it active. It stays active after the mouse leaves.
-  const [activeId, setActiveId] = useState(treatments[0].id)
-  // Mobile: tapping a title opens it (accordion). Tapping it again closes it.
-  const [openId, setOpenId] = useState(treatments[0].id)
+function LoadingPanel() {
+  return (
+    <div className="grid min-h-[440px] animate-pulse gap-8 rounded-2xl bg-slate-blue p-8 md:grid-cols-[2fr_3fr] lg:p-10" aria-busy="true" aria-label="Loading treatments">
+      <div className="flex flex-col justify-between gap-6">
+        {[60, 45, 55, 70, 40].map((w) => <span key={w} className="h-6 rounded bg-white/10" style={{ width: `${w}%` }} />)}
+      </div>
+      <div className="hidden flex-col justify-center gap-4 md:flex">
+        <span className="h-10 w-2/3 rounded bg-white/10" />
+        <span className="h-3 w-full rounded bg-white/10" />
+        <span className="h-3 w-5/6 rounded bg-white/10" />
+      </div>
+    </div>
+  )
+}
 
-  const active = treatments.find((t) => t.id === activeId)
+export default function TreatmentsPanel({ treatments, loading }) {
+  // Desktop: hovering a title makes it active. It stays active after the mouse leaves.
+  const [activeId, setActiveId] = useState(null)
+  // Mobile: tapping a title opens it (accordion). Tapping it again closes it.
+  // `undefined` = nothing tapped yet, so the first one starts open.
+  const [tappedId, setTappedId] = useState(undefined)
+
+  if (loading) return <LoadingPanel />
+  if (!treatments.length) return null
+
+  const active = treatments.find((t) => t.id === activeId) ?? treatments[0]
+  const openId = tappedId === undefined ? treatments[0].id : tappedId
+  const setOpenId = setTappedId
 
   return (
     <div className="rounded-2xl bg-slate-blue text-cream">
@@ -50,7 +69,7 @@ export default function TreatmentsPanel() {
       <div className="hidden min-h-[440px] grid-cols-[2fr_3fr] gap-8 p-8 md:grid lg:p-10">
         <ul className="flex flex-col justify-between">
           {treatments.map((t) => {
-            const isActive = t.id === activeId
+            const isActive = t.id === active.id
             return (
               <li key={t.id}>
                 <button

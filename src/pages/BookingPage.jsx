@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { treatments } from '../data/treatments'
+import { useTreatments } from '../lib/treatments'
 import { sessionLengths, businessTimeZone } from '../data/availability'
 import { getBookedSlots, submitBooking, studioNow, formatDate, formatTime, formatDuration } from '../lib/booking'
 import DateTimePicker from '../components/booking/DateTimePicker'
@@ -82,10 +82,11 @@ const usDate = (key) => { const [y, m, d] = key.split('-'); return `${m}/${d}/${
 
 export default function BookingPage() {
   const [params] = useSearchParams()
-  const preset = treatments.find((t) => t.id === params.get('treatment'))
+  const { treatments, loading: treatmentsLoading } = useTreatments()
 
   const [step, setStep] = useState(0)
-  const [treatmentId, setTreatmentId] = useState(preset?.id ?? null)
+  // Pre-selected from the Services page's "Book" link (?treatment=swedish); ignored if it doesn't match.
+  const [treatmentId, setTreatmentId] = useState(params.get('treatment'))
   const [duration, setDuration] = useState(sessionLengths[0])
   const [slot, setSlot] = useState({ date: null, time: null })
   const [clientType, setClientType] = useState('') // 'new' | 'returning'
@@ -220,6 +221,9 @@ export default function BookingPage() {
                   <div>
                     <h2 className="font-display text-2xl uppercase tracking-wide md:text-3xl">Choose your treatment</h2>
                     <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                      {treatmentsLoading && [1, 2, 3].map((i) => (
+                        <div key={i} className="h-40 animate-pulse rounded-2xl border border-slate-blue/15 bg-white/20" aria-hidden />
+                      ))}
                       {treatments.map((t) => {
                         const active = t.id === treatmentId
                         return (
