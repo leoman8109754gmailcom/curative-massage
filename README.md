@@ -27,15 +27,12 @@ Hosted on Vercel. `vercel.json` sends every route to `index.html` so links like 
 
 ## Content management (Sanity)
 
-Massage techniques (name, description, price, order, show/hide) can be managed in Sanity.
-Until Sanity is connected, the site uses the local list in `src/data/treatments.js`.
+Massage techniques (name, description, price, order, show/hide) are managed in Sanity:
+project `r83xatdb` (curative-massage-bodyworks), dataset `production`, document type `treatment`.
+The Studio's schema matches `sanity/schemaTypes/treatment.js` in this repo.
 
-To connect (free plan):
-
-1. Create a Studio: `npm create sanity@latest -- --template clean --create-project "Curative Massage" --dataset production --output-path studio`
-2. Copy `sanity/schemaTypes/` into `studio/schemaTypes/`, then deploy it: `cd studio && npx sanity deploy`
-3. In sanity.io/manage → API → CORS origins, add `http://localhost:5173` and the Vercel site URL.
-4. Copy `.env.example` to `.env.local` and set `VITE_SANITY_PROJECT_ID`.
-   Add the same variables in Vercel → Settings → Environment Variables, then redeploy.
-5. Add the techniques in the Studio (the web address names must match any existing booking links,
-   e.g. `swedish`, `deep-tissue`).
+- Local: `.env.local` sets `VITE_SANITY_PROJECT_ID` and `VITE_SANITY_DATASET` (see `.env.example`).
+- Vercel: the same two variables must be set in Project → Settings → Environment Variables.
+- Allowed origins (CORS): http://localhost:3333 (Studio), http://localhost:5173, https://curative-massage.vercel.app.
+  Add any custom domain there too when the site moves to one.
+- If Sanity can't be reached, the site falls back to the list in `src/data/treatments.js`.
